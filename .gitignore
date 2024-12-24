@@ -1,0 +1,10 @@
+# Node.js
+node_modules/
+*.log
+
+# Docker
+docker-compose.override.yml
+*.pem
+
+# Build Files
+build/
