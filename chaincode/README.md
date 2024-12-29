@@ -1,6 +1,6 @@
 # FoodChaincode - README
 
-This repository contains the `FoodChaincode`, a Hyperledger Fabric smart contract designed to manage batch data in a supply chain scenario. Below, you will find a brief introduction to Hyperledger Fabric, instructions for setting up the environment, and commands to interact with the chaincode.
+This repository contains the `FoodChaincode`, a Hyperledger Fabric smart contract designed to manage batch data in a supply chain scenario. Below, you will find a brief introduction to Hyperledger Fabric, instructions for setting up the environment on WSL, and commands to interact with the chaincode.
 
 ## Introduction to Hyperledger Fabric
 
@@ -109,4 +109,12 @@ Get the history of changes for a batch:
 
 ```bash
 peer chaincode query -C mychannel -n basic -c '{"function":"GetBatchHistory","Args":["batch1"]}'
+```
+
+## Monitoraggio dei container Docker
+
+Per monitorare lo stato dei container Docker durante l'esecuzione della rete Fabric, utilizza il seguente comando:
+
+```bash
+./monitordocker.sh fabric_test
 ```
