@@ -28,13 +28,9 @@ npm install
 
 ### 3. Configure the Environment
 
-#### a. Wallet Directory
+#### Connection Profiles
 
-Ensure the `wallet` directory is present in the backend folder. This will store the admin and user identities.
-
-#### b. Connection Profiles
-
-Copy the connection profile files (`connection-org1.json`) into the `src/config` directory.
+Copy the connection profile files (`connection-org1.json`) into the `src/config` directory or use the path to directory where it is placed (inside fabric-samples).
 
 ### 4. Enroll the Admin
 
@@ -103,10 +99,10 @@ backend/
 │   ├── register/
 │   │   ├── enrollAdmin.ts
 │   │   └── registerUser.ts
+|   |   └── wallet/
 │   ├── api/
 │   │   └── batchController.ts
 │   └── server.ts
-├── wallet/   # Stores identities
 └── package.json
 ```
 
