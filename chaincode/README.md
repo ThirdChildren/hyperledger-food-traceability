@@ -62,7 +62,7 @@ peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.exa
 Retrieve batch details using:
 
 ```bash
-peer chaincode query -C mychannel -n basic -c '{"function":"GetBatchById","Args":["batch1"]}'
+peer chaincode query -C mychannel -n basic -c '{"function":"GetBatchByID","Args":["batch1"]}'
 ```
 
 ### Updating Batch State
@@ -81,9 +81,9 @@ Get the history of changes for a batch:
 peer chaincode query -C mychannel -n basic -c '{"function":"GetBatchHistory","Args":["batch1"]}'
 ```
 
-## Monitoraggio dei container Docker
+## Monitoring Docker Containers
 
-Per monitorare lo stato dei container Docker durante l'esecuzione della rete Fabric, utilizza il seguente comando:
+To monitor the status of Docker containers during the execution of the Fabric network, use the following command:
 
 ```bash
 ./monitordocker.sh fabric_test
