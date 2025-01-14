@@ -47,3 +47,14 @@ export const updateBatchState = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getAllBatches = async (req: Request, res: Response) => {
+  try {
+    const contract = await getContract();
+
+    const result = await contract.evaluateTransaction("GetAllBatches");
+    res.status(200).json(JSON.parse(result.toString()));
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};

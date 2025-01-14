@@ -53,7 +53,7 @@ npx ts-node src/register/registerUser.ts
 Start the backend server to handle API requests.
 
 ```bash
-npm start
+npx ts-node-dev src/server.ts
 ```
 
 ## API Endpoints

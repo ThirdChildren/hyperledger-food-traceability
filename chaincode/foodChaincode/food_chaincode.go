@@ -152,6 +152,32 @@ func (s *SmartContract) BatchExists(ctx contractapi.TransactionContextInterface,
     return batchJSON != nil, nil
 }
 
+// GetAllBatches returns all batches stored in the ledger
+func (s *SmartContract) GetAllBatches(ctx contractapi.TransactionContextInterface) ([]*Batch, error) {
+    // Definisci un intervallo vuoto per ottenere tutti i record
+    resultsIterator, err := ctx.GetStub().GetStateByRange("", "")
+    if err != nil {
+        return nil, fmt.Errorf("failed to get batches: %v", err)
+    }
+    defer resultsIterator.Close()
+
+    var batches []*Batch
+    for resultsIterator.HasNext() {
+        queryResponse, err := resultsIterator.Next()
+        if err != nil {
+            return nil, fmt.Errorf("error reading batch: %v", err)
+        }
+
+        var batch Batch
+        err = json.Unmarshal(queryResponse.Value, &batch)
+        if err != nil {
+            return nil, fmt.Errorf("error unmarshalling batch: %v", err)
+        }
+        batches = append(batches, &batch)
+    }
+    return batches, nil
+}
+
 
 func main() {
 	chaincode, err := contractapi.NewChaincode(new(SmartContract))

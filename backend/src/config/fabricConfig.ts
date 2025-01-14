@@ -9,7 +9,7 @@ const CONNECTION_PROFILE_PATH = path.resolve(
 );
 
 // Percorso al wallet
-const WALLET_PATH = path.join(process.cwd(), "src/register/wallet");
+const WALLET_PATH = path.join(process.cwd(), "wallet");
 console.log(WALLET_PATH);
 
 // Nome del canale e del contratto

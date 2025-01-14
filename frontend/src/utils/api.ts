@@ -21,13 +21,18 @@ export const getBatchById = async (id: string) => {
 
 export const updateBatchState = async (data: {
   id: string;
-  currentNode: string;
-  state: string;
+  newNode: string;
+  newStatus: string;
 }) => {
   const response = await fetch(BASE_URL, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
+  return response.json();
+};
+
+export const getAllBatches = async () => {
+  const response = await fetch("http://localhost:3000/api/batches");
   return response.json();
 };
