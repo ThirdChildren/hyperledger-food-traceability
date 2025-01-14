@@ -19,6 +19,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { Edit, Info } from "@mui/icons-material";
+import { green } from "@mui/material/colors";
 import { getAllBatches, updateBatchState, getBatchHistory } from "../utils/api";
 
 interface Batch {
@@ -26,6 +27,7 @@ interface Batch {
   productType: string;
   producer: string;
   currentNode: string;
+  status: string;
 }
 
 interface BatchHistoryRecord {
@@ -62,7 +64,7 @@ const BatchHistory = () => {
   const handleEditClick = (batch: Batch) => {
     setSelectedBatch(batch);
     setNewNode(batch.currentNode);
-    setNewStatus("");
+    setNewStatus(batch.status);
     setOpenEditModal(true);
   };
 
@@ -79,7 +81,7 @@ const BatchHistory = () => {
         setBatches((prevBatches) =>
           prevBatches.map((batch) =>
             batch.id === selectedBatch.id
-              ? { ...batch, currentNode: newNode }
+              ? { ...batch, currentNode: newNode, status: newStatus }
               : batch
           )
         );
@@ -126,6 +128,9 @@ const BatchHistory = () => {
                   <b>Current Node</b>
                 </TableCell>
                 <TableCell>
+                  <b>Current Status</b>
+                </TableCell>
+                <TableCell>
                   <b>Actions</b>
                 </TableCell>
               </TableRow>
@@ -137,15 +142,16 @@ const BatchHistory = () => {
                   <TableCell>{batch.productType}</TableCell>
                   <TableCell>{batch.producer}</TableCell>
                   <TableCell>{batch.currentNode}</TableCell>
+                  <TableCell>{batch.status}</TableCell>
                   <TableCell>
                     <IconButton
-                      color="primary"
+                      sx={{ color: green[500] }}
                       onClick={() => handleEditClick(batch)}
                     >
                       <Edit />
                     </IconButton>
                     <IconButton
-                      color="secondary"
+                      color="primary"
                       onClick={() => handleViewHistory(batch)}
                     >
                       <Info />
