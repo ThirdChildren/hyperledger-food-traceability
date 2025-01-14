@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBatchState = exports.getBatchById = exports.createBatch = void 0;
+exports.getBatchHistory = exports.getAllBatches = exports.updateBatchState = exports.getBatchById = exports.createBatch = void 0;
 const fabricConfig_1 = require("../config/fabricConfig");
 const createBatch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -47,3 +47,26 @@ const updateBatchState = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.updateBatchState = updateBatchState;
+const getAllBatches = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const contract = yield (0, fabricConfig_1.getContract)();
+        const result = yield contract.evaluateTransaction("GetAllBatches");
+        res.status(200).json(JSON.parse(result.toString()));
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getAllBatches = getAllBatches;
+const getBatchHistory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const contract = yield (0, fabricConfig_1.getContract)();
+        const result = yield contract.evaluateTransaction("GetBatchHistory", id);
+        res.status(200).json(JSON.parse(result.toString()));
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getBatchHistory = getBatchHistory;

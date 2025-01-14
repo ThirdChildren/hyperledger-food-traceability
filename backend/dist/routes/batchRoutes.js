@@ -6,4 +6,6 @@ const router = (0, express_1.Router)();
 router.post("/batch", batchController_1.createBatch);
 router.get("/batch/:id", batchController_1.getBatchById);
 router.put("/batch", batchController_1.updateBatchState);
+router.get("/batches", batchController_1.getAllBatches);
+router.get("/batch/history/:id", batchController_1.getBatchHistory);
 exports.default = router;

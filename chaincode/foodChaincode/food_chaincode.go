@@ -152,7 +152,7 @@ func (s *SmartContract) BatchExists(ctx contractapi.TransactionContextInterface,
     return batchJSON != nil, nil
 }
 
-// GetAllBatches returns all batches stored in the ledger
+// GetAllBatches ritorna tutti i lotti presenti nello stato ledger
 func (s *SmartContract) GetAllBatches(ctx contractapi.TransactionContextInterface) ([]*Batch, error) {
     // Definisci un intervallo vuoto per ottenere tutti i record
     resultsIterator, err := ctx.GetStub().GetStateByRange("", "")

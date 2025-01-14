@@ -41,48 +41,55 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContract = getContract;
 const fabric_network_1 = require("fabric-network");
+const fabric_ca_client_1 = __importDefault(require("fabric-ca-client"));
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
-// Percorso al connection profile di Org1
+// Percorso al file di configurazione del profilo di connessione
 const CONNECTION_PROFILE_PATH = path.resolve(process.env.HOME || "", "go/src/github.com/ThirdChildren/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json");
-// Percorso al wallet
+// Percorso del wallet
 const WALLET_PATH = path.join(process.cwd(), "wallet");
-console.log(WALLET_PATH);
-// Nome del canale e del contratto
-const CHANNEL_NAME = "mychannel";
-const CHAINCODE_NAME = "basic";
-// Nome utente registrato
-const USER_ID = "appUser";
-function getContract() {
+function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // Legge il profilo di connessione
+            // Carica il profilo di connessione
             const connectionProfile = JSON.parse(fs.readFileSync(CONNECTION_PROFILE_PATH, "utf8"));
-            // Inizializza il wallet
+            const caInfo = connectionProfile.certificateAuthorities["ca.org1.example.com"];
+            const caURL = caInfo.url;
+            // Crea un client Fabric CA
+            const ca = new fabric_ca_client_1.default(caURL);
+            // Crea un wallet per gestire le identità
             const wallet = yield fabric_network_1.Wallets.newFileSystemWallet(WALLET_PATH);
-            // Verifica che l'utente esista nel wallet
-            const userIdentity = yield wallet.get(USER_ID);
-            if (!userIdentity) {
-                throw new Error(`User ${USER_ID} not found in wallet. Please run the registerUser.ts script first.`);
+            // Verifica se l'identità admin esiste già
+            const adminIdentity = yield wallet.get("admin");
+            if (adminIdentity) {
+                console.log("An identity for the admin user 'admin' already exists in the wallet");
+                return;
             }
-            // Configura il gateway
-            const gateway = new fabric_network_1.Gateway();
-            yield gateway.connect(connectionProfile, {
-                wallet,
-                identity: USER_ID,
-                discovery: { enabled: true, asLocalhost: true },
+            // Effettua l'enroll dell'admin e salva le credenziali
+            const enrollment = yield ca.enroll({
+                enrollmentID: "admin",
+                enrollmentSecret: "adminpw",
             });
-            // Accedi alla rete e ottieni il contratto
-            const network = yield gateway.getNetwork(CHANNEL_NAME);
-            const contract = network.getContract(CHAINCODE_NAME);
-            return contract;
+            const x509Identity = {
+                credentials: {
+                    certificate: enrollment.certificate,
+                    privateKey: enrollment.key.toBytes(),
+                },
+                mspId: "Org1MSP",
+                type: "X.509",
+            };
+            yield wallet.put("admin", x509Identity);
+            console.log("Successfully enrolled admin user 'admin' and imported it into the wallet");
         }
         catch (error) {
-            console.error(`Error in getContract: ${error}`);
-            throw error;
+            console.error(`Failed to enroll admin user 'admin': ${error}`);
+            process.exit(1);
         }
     });
 }
+main();

@@ -7,15 +7,19 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Tooltip,
   CircularProgress,
   IconButton,
   Modal,
   Box,
   TextField,
   Button,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
-import { Edit } from "@mui/icons-material";
-import { getAllBatches, updateBatchState } from "../utils/api";
+import { Edit, Info } from "@mui/icons-material";
+import { getAllBatches, updateBatchState, getBatchHistory } from "../utils/api";
 
 interface Batch {
   id: string;
@@ -24,11 +28,20 @@ interface Batch {
   currentNode: string;
 }
 
+interface BatchHistoryRecord {
+  txId: string;
+  timestamp: string;
+  isDeleted: boolean;
+  [key: string]: any;
+}
+
 const BatchHistory = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
-  const [openModal, setOpenModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openHistoryModal, setOpenHistoryModal] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
+  const [history, setHistory] = useState<BatchHistoryRecord[]>([]);
   const [newNode, setNewNode] = useState("");
   const [newStatus, setNewStatus] = useState("");
 
@@ -38,7 +51,7 @@ const BatchHistory = () => {
         const response = await getAllBatches();
         setBatches(response);
       } catch (error) {
-        console.error("Error fetching batch history:", error);
+        console.error("Error fetching batches:", error);
       } finally {
         setLoading(false);
       }
@@ -49,8 +62,8 @@ const BatchHistory = () => {
   const handleEditClick = (batch: Batch) => {
     setSelectedBatch(batch);
     setNewNode(batch.currentNode);
-    setNewStatus(""); // Puoi inizializzarlo o lasciare vuoto
-    setOpenModal(true);
+    setNewStatus("");
+    setOpenEditModal(true);
   };
 
   const handleUpdateBatch = async () => {
@@ -62,8 +75,7 @@ const BatchHistory = () => {
           newStatus: newStatus,
         });
         alert(`Batch ${selectedBatch.id} updated successfully`);
-        setOpenModal(false);
-        // Aggiorna la tabella dopo la modifica
+        setOpenEditModal(false);
         setBatches((prevBatches) =>
           prevBatches.map((batch) =>
             batch.id === selectedBatch.id
@@ -77,11 +89,21 @@ const BatchHistory = () => {
     }
   };
 
+  const handleViewHistory = async (batch: Batch) => {
+    try {
+      const historyData = await getBatchHistory(batch.id);
+      setHistory(historyData);
+      setOpenHistoryModal(true);
+    } catch (error) {
+      console.error("Error fetching batch history:", error);
+    }
+  };
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
       <Paper className="p-6 shadow-md w-full max-w-4xl">
         <Typography variant="h4" className="mb-6 text-center font-bold">
-          Batch History
+          Batch Management
         </Typography>
         {loading ? (
           <div className="flex justify-center mt-6">
@@ -122,6 +144,12 @@ const BatchHistory = () => {
                     >
                       <Edit />
                     </IconButton>
+                    <IconButton
+                      color="secondary"
+                      onClick={() => handleViewHistory(batch)}
+                    >
+                      <Info />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
@@ -130,7 +158,7 @@ const BatchHistory = () => {
         )}
 
         {/* Modal per Modifica Stato */}
-        <Modal open={openModal} onClose={() => setOpenModal(false)}>
+        <Modal open={openEditModal} onClose={() => setOpenEditModal(false)}>
           <Box className="bg-white p-6 rounded shadow-md w-96 mx-auto mt-20">
             <Typography variant="h6" className="mb-4">
               Update Batch State
@@ -158,6 +186,43 @@ const BatchHistory = () => {
                 Update
               </Button>
             </div>
+          </Box>
+        </Modal>
+
+        {/* Modal per Visualizzazione Storico */}
+        <Modal
+          open={openHistoryModal}
+          onClose={() => setOpenHistoryModal(false)}
+        >
+          <Box className="bg-white p-6 rounded shadow-md w-96 mx-auto mt-20">
+            <Typography variant="h6" className="mb-4">
+              Batch History
+            </Typography>
+            <List>
+              {history.map((record, index) => (
+                <ListItem key={index}>
+                  <Tooltip title={record.txId} placement="top" arrow>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">
+                          <b>Transaction ID:</b> {record.txId.slice(0, 12)}...
+                        </Typography>
+                      }
+                      secondary={
+                        <>
+                          <Typography variant="body2">
+                            <b>Current Node:</b> {record.currentNode}
+                          </Typography>
+                          <Typography variant="body2">
+                            <b>Status:</b> {record.status}
+                          </Typography>
+                        </>
+                      }
+                    />
+                  </Tooltip>
+                </ListItem>
+              ))}
+            </List>
           </Box>
         </Modal>
       </Paper>

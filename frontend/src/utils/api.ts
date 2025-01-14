@@ -36,3 +36,11 @@ export const getAllBatches = async () => {
   const response = await fetch("http://localhost:3000/api/batches");
   return response.json();
 };
+
+export const getBatchHistory = async (id: string) => {
+  const response = await fetch(`${BASE_URL}/history/${id}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch batch history: ${response.statusText}`);
+  }
+  return response.json();
+};
